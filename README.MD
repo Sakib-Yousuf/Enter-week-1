@@ -1,26 +1,35 @@
-# 🏢 Building Energy Data Analysis
+# 🏢 Building Energy Consumption — Data Preparation & Analysis
 
-This project analyzes building energy usage data using Python.  
-It includes data cleaning, outlier detection, visualization, and encoding of categorical features.
+Short project README for preprocessing and exploratory analysis of building energy usage.
 
-## 📊 Features
-- Loads and inspects dataset
-- Detects missing values and outliers (using IQR)
-- Visualizes data (histogram, boxplot, scatterplot, heatmap)
-- Encodes categorical columns:
+## Overview
+This repository contains a Jupyter notebook that performs data loading, inspection, visualization, outlier detection, and basic categorical encoding on an hourly building energy dataset.
+
+## Files
+- [notebook/preprocssing.ipynb](notebook/preprocssing.ipynb) — preprocessing notebook (load, EDA, plots, encoding)
+- [dataset/building_energy_data_extended.csv](dataset/building_energy_data_extended.csv) — dataset (Timestamp, Building_ID, Energy_Usage (kWh), Temperature (°C), Humidity (%), Building_Type, Occupancy_Level)
+- [requirements.txt](requirements.txt) — Python dependencies
+- README.MD — this file
+
+## What the notebook does
+- Loads the CSV dataset and prints shape / info
+- Summarizes numerical columns with df.describe().T
+- Visualizes distributions and relationships:
+  - Histograms for numerical columns
+  - Boxplots per numerical column (IQR / outlier visualization)
+  - Scatterplots (Temperature / Humidity vs Energy_Usage)
+  - Correlation heatmap
+- Detects outliers using IQR-based whisker function
+- Encodes categorical features:
   - Label Encoding for `Building_Type`
-  - Ordinal Encoding for `Occupancy_Level` (`Low < Medium < High`)
+  - Ordinal Encoding for `Occupancy_Level` in order `Low < Medium < High`
 
-## 🧰 Libraries Used
-- pandas  
-- numpy  
-- matplotlib  
-- seaborn  
-- scikit-learn  
+You can open the notebook here: [notebook/preprocssing.ipynb](notebook/preprocssing.ipynb)
 
-## ⚙️ How to Run
-1. Place your dataset at:  
-   `../dataset/building_energy_data_extended.csv`
-2. Install dependencies:  
+## How to run
+1. Create / activate your virtual environment (optional):
+   - Windows (PowerShell): `.\mvenv\Scripts\Activate.ps1`
+   - Windows (cmd): `.\mvenv\Scripts\activate.bat`
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
