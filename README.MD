@@ -1,35 +1,63 @@
-# 🏢 Building Energy Consumption — Data Preparation & Analysis
+# Building Energy Consumption — Forecasting Prototype
 
-Short project README for preprocessing and exploratory analysis of building energy usage.
+A small project that trains a simple regression model to predict building energy usage (kWh) from environmental and building features. The repository contains datasets and Jupyter notebooks for preprocessing and modelling.
 
-## Overview
-This repository contains a Jupyter notebook that performs data loading, inspection, visualization, outlier detection, and basic categorical encoding on an hourly building energy dataset.
+## Key points
+- Input features used by the current model: `Temperature (°C)`, `Humidity (%)`, `Building_Type`, `Occupancy_Level`.
+- Target: `Energy_Usage (kWh)`.
+- Current model (in `notebook/model.ipynb`): RandomForestRegressor (n_estimators=300, random_state=42).
 
-## Files
-- [notebook/preprocssing.ipynb](notebook/preprocssing.ipynb) — preprocessing notebook (load, EDA, plots, encoding)
-- [dataset/building_energy_data_extended.csv](dataset/building_energy_data_extended.csv) — dataset (Timestamp, Building_ID, Energy_Usage (kWh), Temperature (°C), Humidity (%), Building_Type, Occupancy_Level)
-- [requirements.txt](requirements.txt) — Python dependencies
-- README.MD — this file
+## Repository structure
+- `dataset/` — CSV files used by notebooks (e.g., `processed_data.csv`, `Raw_data.csv`).
+- `notebook/preprocssing.ipynb` — preprocessing and exploratory data analysis.
+- `notebook/model.ipynb` — model training, prediction, and basic evaluation (MSE, MAE, R²).
+- `requirements.txt` — Python dependencies to install.
 
-## What the notebook does
-- Loads the CSV dataset and prints shape / info
-- Summarizes numerical columns with df.describe().T
-- Visualizes distributions and relationships:
-  - Histograms for numerical columns
-  - Boxplots per numerical column (IQR / outlier visualization)
-  - Scatterplots (Temperature / Humidity vs Energy_Usage)
-  - Correlation heatmap
-- Detects outliers using IQR-based whisker function
-- Encodes categorical features:
-  - Label Encoding for `Building_Type`
-  - Ordinal Encoding for `Occupancy_Level` in order `Low < Medium < High`
+## How the model notebook is organized
+1. Load `dataset/processed_data.csv`.
+2. Select features and target:
+   - X = `['Temperature (°C)', 'Humidity (%)', 'Building_Type', 'Occupancy_Level']`
+   - y = `Energy_Usage (kWh)`
+3. Train/Test split (test_size=0.2, random_state=42).
+4. Train a RandomForestRegressor (n_estimators=300).
+5. Predict on test set and print evaluation metrics: MSE, MAE, R².
 
-You can open the notebook here: [notebook/preprocssing.ipynb](notebook/preprocssing.ipynb)
+## Quick start (Windows PowerShell)
+1. Create & activate a virtual environment (optional but recommended):
 
-## How to run
-1. Create / activate your virtual environment (optional):
-   - Windows (PowerShell): `.\mvenv\Scripts\Activate.ps1`
-   - Windows (cmd): `.\mvenv\Scripts\activate.bat`
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
 2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
+
+```powershell
+pip install -r requirements.txt
+```
+
+3. Open the notebooks in Jupyter Lab / Notebook and run the cells:
+
+```powershell
+jupyter lab
+```
+
+Then open `notebook/preprocssing.ipynb` and `notebook/model.ipynb`.
+
+## Reproducing the training run (notes)
+- The model notebook trains the RandomForest on the preprocessed CSV. There is no separate training script; use the notebook to run training and evaluation.
+- If your `Building_Type` or `Occupancy_Level` are categorical strings, ensure they are encoded before training (the notebooks handle simple encodings). If you run training from a script, ensure consistent encoding for train and inference.
+
+## Results & evaluation
+- The notebook prints MSE, MAE, and R² for the test set (look at the last cells in `notebook/model.ipynb`).
+
+## Next steps & improvements
+- Add a dedicated training script (e.g., `train.py`) to allow CLI runs and reproducible checkpoints.
+- Save the trained model with `joblib` or `pickle` and provide an inference example script.
+- Improve preprocessing: one-hot or target encoding for `Building_Type`, consistent ordinal mapping for `Occupancy_Level`.
+- Hyperparameter tuning (GridSearchCV / RandomizedSearchCV) and cross-validation.
+- Add unit tests for preprocessing functions and a small CI workflow.
+
+## Dependencies
+Install from `requirements.txt`. It likely contains packages such as `pandas`, `scikit-learn`, `matplotlib` / `seaborn`, and `jupyter`.
+
