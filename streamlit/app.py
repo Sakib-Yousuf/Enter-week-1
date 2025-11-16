@@ -2,51 +2,71 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import matplotlib.pyplot as plt
 
-# ------------------------------
-# Load trained model
-# ------------------------------
+# ===============================
+# 1. LOAD MODEL & FEATURES
+# ===============================
 model = joblib.load("../models/model.pkl")
+feature_cols = joblib.load("../models/feature_cols.pkl")  # saved column order
 
-# ------------------------------
-# Page Setup
-# ------------------------------
 st.set_page_config(page_title="Energy Usage Predictor", layout="wide")
-st.title("⚡ Energy Usage Prediction")
-st.write("Provide values below and get predicted Energy Usage (kWh).")
+st.title("🏢 Building Energy Usage Prediction Dashboard")
 
-# ------------------------------
-# Input Fields (Based on Model Features)
-# ------------------------------
+# ===============================
+# 2. UPLOAD DATA OR INPUT MANUALLY
+# ===============================
+st.sidebar.header("Upload CSV")
+uploaded_file = st.sidebar.file_uploader("Upload CSV file for prediction", type=["csv"])
 
-# IMPORTANT: Replace this with actual features from your model
-required_features = [
-    "Hour","DayOfWeek","lag_1","lag_2","lag_3","lag_6",
-    "lag_12","lag_24","roll_mean_3","roll_mean_6","roll_mean_12",
-    "roll_std_3","roll_std_6","roll_std_12","sin_hour","cos_hour",
-    "sin_day","cos_day"
-]
+st.sidebar.markdown("---")
+st.sidebar.header("Manual Input (optional)")
 
-st.sidebar.header("📥 Enter Input Values")
+# Placeholder for manual input
+manual_input = {}
+for f in feature_cols:
+    manual_input[f] = st.sidebar.number_input(f, value=0.0)
 
-input_values = {}
-for feature in required_features:
-    input_values[feature] = st.sidebar.number_input(f"{feature}", value=0.0, format="%.4f")
+# ===============================
+# 3. PREDICTION LOGIC
+# ===============================
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    
+    # Ensure feature columns exist
+    missing_cols = [c for c in feature_cols if c not in df.columns]
+    if missing_cols:
+        st.error(f"Missing columns in uploaded file: {missing_cols}")
+    else:
+        X = df[feature_cols]
+        y_pred = model.predict(X)
+        df["Predicted_Energy_Usage"] = y_pred
 
-# Convert to DataFrame for prediction
-user_df = pd.DataFrame([input_values])
+        st.subheader("Predictions")
+        st.dataframe(df.head(20))
 
-# ------------------------------
-# Prediction Button
-# ------------------------------
-if st.button("🔮 Predict"):
-    prediction = model.predict(user_df)[0]
-    st.success(f"Predicted Energy Usage: **{prediction:.3f} kWh**")
+        # Plot actual vs predicted if Energy_Usage exists
+        if "Energy_Usage (kWh)" in df.columns:
+            fig, ax = plt.subplots(figsize=(10,4))
+            ax.plot(df.index, df["Energy_Usage (kWh)"], label="Actual")
+            ax.plot(df.index, df["Predicted_Energy_Usage"], label="Predicted")
+            ax.set_xlabel("Index")
+            ax.set_ylabel("Energy Usage (kWh)")
+            ax.legend()
+            st.pyplot(fig)
 
-# ------------------------------
-# Footer
-# ------------------------------
-st.write("---")
-st.caption("Model Powered by RandomForestRegressor")
+else:
+    st.warning("Upload a CSV to get predictions, or enter manual input below.")
 
+    # Convert manual input dict to DataFrame
+    X_manual = pd.DataFrame([manual_input])
+    y_manual_pred = model.predict(X_manual)[0]
 
+    st.subheader("Predicted Energy Usage")
+    st.metric("Energy_Usage (kWh)", f"{y_manual_pred:.2f}")
+
+# ===============================
+# 4. FOOTER
+# ===============================
+st.markdown("---")
+st.markdown("Powered by Random Forest Regression | EDUNET FOUNDATION Internship")
