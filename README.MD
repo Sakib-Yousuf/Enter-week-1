@@ -1,63 +1,101 @@
-# Building Energy Consumption — Forecasting Prototype
+# ⚡ Energy Usage Prediction Model
 
-A small project that trains a simple regression model to predict building energy usage (kWh) from environmental and building features. The repository contains datasets and Jupyter notebooks for preprocessing and modelling.
+This project is a **Streamlit-based web application** that predicts **Energy Usage (kWh)** using a **pre-trained Random Forest Regression model**.  
+The machine learning model is already trained and saved (`rf.pkl`), and the app provides a simple and interactive **frontend UI** to generate predictions based on input feature values.
 
-## Key points
-- Input features used by the current model: `Temperature (°C)`, `Humidity (%)`, `Building_Type`, `Occupancy_Level`.
-- Target: `Energy_Usage (kWh)`.
-- Current model (in `notebook/model.ipynb`): RandomForestRegressor (n_estimators=300, random_state=42).
+---
 
-## Repository structure
-- `dataset/` — CSV files used by notebooks (e.g., `processed_data.csv`, `Raw_data.csv`).
-- `notebook/preprocssing.ipynb` — preprocessing and exploratory data analysis.
-- `notebook/model.ipynb` — model training, prediction, and basic evaluation (MSE, MAE, R²).
-- `requirements.txt` — Python dependencies to install.
+## 📌 Overview
 
-## How the model notebook is organized
-1. Load `dataset/processed_data.csv`.
-2. Select features and target:
-   - X = `['Temperature (°C)', 'Humidity (%)', 'Building_Type', 'Occupancy_Level']`
-   - y = `Energy_Usage (kWh)`
-3. Train/Test split (test_size=0.2, random_state=42).
-4. Train a RandomForestRegressor (n_estimators=300).
-5. Predict on test set and print evaluation metrics: MSE, MAE, R².
+This application takes engineered time-series features such as lag values, rolling window statistics, and Fourier seasonal features as inputs, and generates a real-time prediction for energy usage.
 
-## Quick start (Windows PowerShell)
-1. Create & activate a virtual environment (optional but recommended):
+The goal of this project is to make the model **accessible, interactive, and user-friendly** without needing to run any training code again.
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+---
+
+## 🧠 Model Information
+
+- **Type:** Regression Model  
+- **Algorithm:** RandomForestRegressor  
+- **Framework:** scikit-learn  
+- **Saved File:** `rf.pkl` (loaded via joblib)  
+- **Training Data:** `preprocessed_energy_data.csv`
+
+The model was trained after applying:
+- Lag features
+- Rolling mean & standard deviation
+- Outlier handling
+- Fourier transformation for seasonality
+
+---
+
+## 📂 Project Structure
+
+```
+Project/
+│
+├── app.py                       # Streamlit frontend (UI)
+├── models/
+│   └── rf.pkl                   # Saved trained model
+└── Dataset/
+    └── preprocessed_energy_data.csv
 ```
 
-2. Install dependencies:
+---
 
-```powershell
-pip install -r requirements.txt
+## 🛠️ Requirements
+
+Install all required dependencies using:
+
+```bash
+pip install streamlit pandas numpy scikit-learn joblib
 ```
 
-3. Open the notebooks in Jupyter Lab / Notebook and run the cells:
+---
 
-```powershell
-jupyter lab
+## 🚀 Running the Application
+
+Execute the following command in your terminal:
+
+```bash
+streamlit run app.py
 ```
 
-Then open `notebook/preprocssing.ipynb` and `notebook/model.ipynb`.
+Once executed, the web app will automatically open in your default browser.  
+If not, manually visit the link displayed in the terminal (e.g. `http://localhost:8501`).
 
-## Reproducing the training run (notes)
-- The model notebook trains the RandomForest on the preprocessed CSV. There is no separate training script; use the notebook to run training and evaluation.
-- If your `Building_Type` or `Occupancy_Level` are categorical strings, ensure they are encoded before training (the notebooks handle simple encodings). If you run training from a script, ensure consistent encoding for train and inference.
+---
 
-## Results & evaluation
-- The notebook prints MSE, MAE, and R² for the test set (look at the last cells in `notebook/model.ipynb`).
+## 🔢 Input Features for Prediction
 
-## Next steps & improvements
-- Add a dedicated training script (e.g., `train.py`) to allow CLI runs and reproducible checkpoints.
-- Save the trained model with `joblib` or `pickle` and provide an inference example script.
-- Improve preprocessing: one-hot or target encoding for `Building_Type`, consistent ordinal mapping for `Occupancy_Level`.
-- Hyperparameter tuning (GridSearchCV / RandomizedSearchCV) and cross-validation.
-- Add unit tests for preprocessing functions and a small CI workflow.
+The app requires the following features to predict energy usage:
 
-## Dependencies
-Install from `requirements.txt`. It likely contains packages such as `pandas`, `scikit-learn`, `matplotlib` / `seaborn`, and `jupyter`.
+| Category | Features |
+|----------|----------|
+| Time-based | `Hour`, `DayOfWeek` |
+| Lag Features | `lag_1`, `lag_2`, `lag__3`, `lag_6`, `lag_12`, `lag_24` |
+| Rolling Window Mean | `roll_mean_3`, `roll_mean_6`, `roll_mean_12` |
+| Rolling Window Std | `roll_std_3`, `roll_std_6`, `roll_std_12` |
+| Seasonal Fourier | `sin_hour`, `cos_hour`, `sin_day`, `cos_day` |
 
+These values can be entered manually using numeric input controls in the sidebar.
+
+---
+
+## 🧾 Application Features
+
+✔ Loads saved ML model using joblib  
+✔ Clean and responsive Streamlit interface  
+✔ Real-time prediction  
+✔ Numerical user input fields  
+✔ No backend retraining or preprocessing required  
+
+---
+
+
+
+
+## ✨ Author
+
+**Your Name Here**  
+Machine Learning & Data Science Enthusiast  
